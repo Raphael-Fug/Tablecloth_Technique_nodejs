@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kỹ thuật khăn trải bàn</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Roboto:wght@400;500&display=swap">
+    <style>
+      :root {
+        --primary-color: #3f51b5;
+        --primary-light: #e8eaf6;
+        --secondary-color: #ff4081;
+        --text-primary: #333;
+        --text-secondary: #666;
+        --box-bg: #fff;
+        --box-border: #e0e0e0;
+        --box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        --box-radius: 12px;
+        --disabled-bg: #f5f5f5;
+        --active-box-border: #3f51b5;
+        --gradient-bg: linear-gradient(135deg, #f5f7ff 0%, #fff 100%);
+      }
+      
+      body { 
+        font-family: 'Roboto', system-ui, sans-serif; 
+        margin: 0; 
+        padding: 0; 
+        background: var(--gradient-bg);
+        color: var(--text-primary);
+        min-height: 100vh;
+      }
+      
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 32px 24px;
+      }
+      
+      h1 { 
+        font-family: 'Montserrat', sans-serif;
+        text-align: center; 
+        margin: 0 0 32px; 
+        font-size: 42px; 
+        font-weight: 700;
+        color: var(--primary-color);
+        position: relative;
+        padding-bottom: 12px;
+      }
+      
+      h1:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background: var(--secondary-color);
+        border-radius: 2px;
+      }
+      
+      .board {
+        display: grid; 
+        grid-template-columns: 1fr 1.2fr 1fr; 
+        grid-template-rows: auto auto auto; 
+        gap: 28px; 
+        margin: 0 auto; 
+        align-items: stretch;
+      }
+      
+      .group-box, .center-box {
+        background: var(--box-bg); 
+        border: 2px solid var(--box-border); 
+        border-radius: var(--box-radius); 
+        padding: 16px; 
+        display: flex; 
+        flex-direction: column;
+        min-height: 240px;
+        box-shadow: var(--box-shadow);
+        transition: all 0.3s ease;
+      }
+      
+      .group-box:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+      }
+      
+      .group-box textarea, .center-box textarea {
+        flex: 1; 
+        width: 100%; 
+        resize: none; 
+        border: none; 
+        outline: none; 
+        font-size: 18px; 
+        line-height: 1.5; 
+        padding: 12px; 
+        background: transparent;
+        font-family: 'Roboto', sans-serif;
+        color: var(--text-primary);
+        border-radius: 8px;
+      }
+      
+      .group-box textarea:focus, .center-box textarea:focus {
+        background: rgba(63, 81, 181, 0.03);
+      }
+      
+      .label { 
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 600; 
+        margin: 4px 0 12px; 
+        color: var(--primary-color); 
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--box-border);
+      }
+      
+      .label::before {
+        content: '';
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background: var(--secondary-color);
+        border-radius: 50%;
+        margin-right: 8px;
+      }
+      
+      .muted { 
+        color: var(--text-secondary); 
+        font-size: 14px; 
+      }
+      
+      .disabled textarea { 
+        background: var(--disabled-bg); 
+        color: var(--text-secondary);
+      }
+      
+      .disabled {
+        border-color: var(--box-border);
+        opacity: 0.9;
+      }
+      
+      /* Make active group more noticeable */
+      .active-group {
+        border-color: var(--active-box-border);
+        border-width: 2px;
+        box-shadow: 0 0 0 1px rgba(63, 81, 181, 0.2);
+      }
+      
+      /* Center box higher */
+      .center-box { 
+        min-height: 480px; 
+        background: white;
+        border-color: var(--primary-color);
+        border-width: 2px;
+      }
+      
+      /* Place items on grid */
+      #box-center { grid-column: 2; grid-row: 1 / span 2; }
+      #box-group5 { grid-column: 2; grid-row: 3; }
+      
+      .footer { 
+        max-width: 1400px; 
+        margin: 24px auto 0; 
+        color: var(--text-secondary); 
+        display: flex; 
+        justify-content: space-between; 
+        font-size: 14px;
+        padding: 16px 8px;
+        border-top: 1px solid var(--box-border);
+      }
+      
+      .footer a {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+      
+      .footer a:hover {
+        color: var(--secondary-color);
+        text-decoration: underline;
+      }
+      
+      #currentGroup {
+        font-weight: 500;
+        color: var(--primary-color);
+      }
+      
+      /* Responsive adjustments */
+      @media (max-width: 1200px) {
+        .board {
+          grid-template-columns: 1fr 1fr;
+          grid-template-rows: auto;
+        }
+        #box-center { 
+          grid-column: 1 / span 2; 
+          grid-row: 1;
+          min-height: 300px;
+        }
+        #box-group1 { grid-column: 1; grid-row: 2; }
+        #box-group2 { grid-column: 2; grid-row: 2; }
+        #box-group3 { grid-column: 1; grid-row: 3; }
+        #box-group4 { grid-column: 2; grid-row: 3; }
+        #box-group5 { grid-column: 1 / span 2; grid-row: 4; }
+      }
+      
+      @media (max-width: 768px) {
+        .board {
+          grid-template-columns: 1fr;
+        }
+        #box-center { 
+          grid-column: 1; 
+          grid-row: 1;
+        }
+        #box-group1 { grid-column: 1; grid-row: 2; }
+        #box-group2 { grid-column: 1; grid-row: 3; }
+        #box-group3 { grid-column: 1; grid-row: 4; }
+        #box-group4 { grid-column: 1; grid-row: 5; }
+        #box-group5 { grid-column: 1; grid-row: 6; }
+        
+        h1 {
+          font-size: 32px;
+        }
+        
+        .container {
+          padding: 20px 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Kỹ thuật khăn trải bàn</h1>
+      <div class="board">
+        <div class="group-box" id="box-group1">
+          <div class="label">Nhóm 1</div>
+          <textarea id="group1" placeholder="Nhập nội dung của Nhóm 1 tại đây..."></textarea>
+        </div>
+        <div class="center-box" id="box-center">
+          <div class="label">Tổng hợp</div>
+          <textarea id="combined" placeholder="Tổng hợp từ tất cả các nhóm sẽ hiển thị ở đây..."></textarea>
+        </div>
+        <div class="group-box" id="box-group2">
+          <div class="label">Nhóm 2</div>
+          <textarea id="group2" placeholder="Nhập nội dung của Nhóm 2 tại đây..."></textarea>
+        </div>
+        <div class="group-box" id="box-group3">
+          <div class="label">Nhóm 3</div>
+          <textarea id="group3" placeholder="Nhập nội dung của Nhóm 3 tại đây..."></textarea>
+        </div>
+        <div class="group-box" id="box-group4">
+          <div class="label">Nhóm 4</div>
+          <textarea id="group4" placeholder="Nhập nội dung của Nhóm 4 tại đây..."></textarea>
+        </div>
+        <div class="group-box" id="box-group5">
+          <div class="label">Nhóm 5</div>
+          <textarea id="group5" placeholder="Nhập nội dung của Nhóm 5 tại đây..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <div class="muted">Bạn đang ở: <span id="currentGroup">(đang tải...)</span></div>
+      <div><a href="/" class="muted">Quay lại chọn nhóm</a></div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+      const groupTextareas = {
+        group1: document.getElementById('group1'),
+        group2: document.getElementById('group2'),
+        group3: document.getElementById('group3'),
+        group4: document.getElementById('group4'),
+        group5: document.getElementById('group5')
+      };
+      const combinedTextarea = document.getElementById('combined');
+      const currentGroupEl = document.getElementById('currentGroup');
+
+      let myGroupId = null;
+      let ignoreLocalChange = false;
+
+      // Helpers
+      function setEditablePermissions() {
+        Object.entries(groupTextareas).forEach(([gid, ta]) => {
+          const canEdit = gid === myGroupId;
+          ta.readOnly = !canEdit;
+          const boxEl = document.getElementById('box-' + gid);
+          boxEl.classList.toggle('disabled', !canEdit);
+          boxEl.classList.toggle('active-group', canEdit);
+        });
+        combinedTextarea.readOnly = true; // center is auto-generated
+        document.getElementById('box-center').classList.add('disabled');
+        currentGroupEl.textContent = myGroupId ? myGroupId.replace('group','Nhóm ') : 'Chưa chọn (về trang chủ)';
+      }
+
+      // Initial state from server via socket
+      socket.on('init', (state) => {
+        myGroupId = state.groupId || null;
+        if (!myGroupId) {
+          window.location.href = '/';
+          return;
+        }
+        Object.entries(state.groupTexts || {}).forEach(([gid, text]) => {
+          if (groupTextareas[gid]) groupTextareas[gid].value = text || '';
+        });
+        combinedTextarea.value = state.combinedText || '';
+        setEditablePermissions();
+      });
+
+      // Realtime updates from others
+      socket.on('group:updated', ({ groupId, text }) => {
+        if (groupTextareas[groupId]) {
+          ignoreLocalChange = true;
+          groupTextareas[groupId].value = text;
+          ignoreLocalChange = false;
+        }
+      });
+      socket.on('combined:updated', ({ text }) => {
+        ignoreLocalChange = true;
+        combinedTextarea.value = text;
+        ignoreLocalChange = false;
+      });
+
+      // Local edits
+      Object.entries(groupTextareas).forEach(([gid, ta]) => {
+        ta.addEventListener('input', () => {
+          if (ignoreLocalChange) return;
+          socket.emit('group:update', { groupId: gid, text: ta.value });
+        });
+      });
+      // center board is read-only now
+    </script>
+  </body>
+</html>
